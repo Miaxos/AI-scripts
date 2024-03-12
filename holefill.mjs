@@ -37,7 +37,7 @@ if (i % 2 === 0) {
 
 var file = process.argv[2];
 var curr = process.argv[3];
-var model = process.argv[4] || "gpt-4-0125-preview";
+var model = process.argv[4] || "gpt-3.5-turbo";
 
 if (!file) {
   console.log("Usage: holefill <file> [<shortened_file>] [<model_name>]");

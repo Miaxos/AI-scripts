@@ -1,10 +1,17 @@
 import fetch from 'node-fetch';
 import fs from 'fs/promises';
 import path from 'path';
+import { exec } from "child_process";
+import { promisify } from "util";
 
 async function getAnthropicKey() {
-  const keyPath = path.join(process.env.HOME, '.config', 'anthropic.token');
-  return (await fs.readFile(keyPath, 'utf8')).trim();
+  const token = ((await promisify(exec)("op item get yd5qlqirps2mvihzw4wah4edhm --fields password")).stdout);
+  if (token === undefined) {
+    console.error("Error: openai token not found");
+    process.exit(1);
+  } else {
+    return token.trim();
+  }
 }
 
 export async function ask({ system, prompt, model = 'claude-3-opus-20240229', temperature = 1, debug = true }) {

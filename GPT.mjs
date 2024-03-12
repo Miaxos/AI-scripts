@@ -6,22 +6,18 @@ import fs from "fs/promises";
 import os from "os";
 import path from "path";
 import { encode } from "gpt-tokenizer/esm/model/davinci-codex"; // tokenizer
+import { exec } from "child_process";
+import { promisify } from "util";
 
-const openai = new OpenAI({apiKey: await get_token()});
+const openai = new OpenAI({ apiKey: (await get_token()) });
 
 export async function get_token() {
-  const tokenPath = path.join(os.homedir(), ".config", "openai.token");
-  try {
-    const token = (await fs.readFile(tokenPath, "utf8")).trim();
-    return token;
-  } catch (err) {
-    if (err.code === "ENOENT") {
-      console.error("Error: openai.token file not found in `~/.config/openai.token`.");
-      console.error("Please make sure the file exists and contains your OpenAI API token.");
-    } else {
-      console.error("Error reading openai.token file:", err.message);
-    }
+  const token = ((await promisify(exec)("op item get cvr52cbgtpju3l4dhrilu3hz3u --fields password")).stdout);
+  if (token === undefined) {
+    console.error("Error: openai token not found");
     process.exit(1);
+  } else {
+    return token.trim();
   }
 }
 
