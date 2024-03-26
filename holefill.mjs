@@ -8,19 +8,19 @@ import path from 'path';
 
 const system = `
 You are a HOLE FILLER. You are provided with a file containing holes, formatted
-as '{{HOLE}}'. Your TASK is to answer with a string to replace this hole with.
+as '[[HOLE]]'. Your TASK is to answer with a string to replace this hole with.
 
 ## EXAMPLE QUERY:
 
 function sum_evens(lim) {
   var sum = 0;
   for (var i = 0; i < lim; ++i) {
-    {{LOOP}}
+    [[LOOP]]
   }
   return sum;
 }
 
-TASK: Fill the {{LOOP}} hole.
+TASK: Fill the [[LOOP]] hole.
 
 ## CORRECT ANSWER:
 
@@ -30,7 +30,7 @@ if (i % 2 === 0) {
 
 ## NOTICE THE INDENTATION:
 
-1. The first line is NOT indented, because there are already spaces before {{LOOP}}.
+1. The first line is NOT indented, because there are already spaces before [[LOOP]].
 
 2. The other lines ARE indented, to match the identation of the context.
 `;
@@ -42,7 +42,7 @@ var model = process.argv[4] || "gpt-3.5-turbo";
 if (!file) {
   console.log("Usage: holefill <file> [<shortened_file>] [<model_name>]");
   console.log("");
-  console.log("This will replace all {{HOLES}} in <file>, using GPT-4 / Claude-3.");
+  console.log("This will replace all [[HOLES]] in <file>, using GPT-4 / Claude-3.");
   console.log("A shortened file can be used to omit irrelevant parts.");
   process.exit();
 }
@@ -66,7 +66,7 @@ while ((match = regex.exec(curr_code)) !== null) {
 }
 
 var tokens = GPT.token_count(curr_code);
-var holes = curr_code.match(/{{\w+}}/g) || [];
+var holes = curr_code.match(/\[\[\w+\]\]/g) || [];
 var ask = model.startsWith("claude") ? Claude.ask : GPT.ask;
 
 console.log("holes_found:", holes);
@@ -75,7 +75,7 @@ console.log("model_label:", model);
 
 for (let hole of holes) {
   console.log("next_filled: " + hole + "...");
-  var prompt = curr_code + "\nTASK: Fill the {{"+hole+"}} hole. Answer only with the EXACT completion to replace {{"+hole+"}} with. INDENT IT BASED ON THE CONTEXT. DO NOT USE BACKTICKS.";
+  var prompt = curr_code + "\nTASK: Fill the [["+hole+"]] hole. Answer only with the EXACT completion to replace [["+hole+"]] with. INDENT IT BASED ON THE CONTEXT. DO NOT USE BACKTICKS.";
   var answer = await ask({system, prompt, model});
   file_code = file_code.replace(hole, answer);
 }
