@@ -21,12 +21,12 @@ export async function get_token() {
   }
 }
 
-export async function ask({system, prompt, model, temperature}) {
+export async function ask({ system, prompt, model, temperature }) {
   const stream = await openai.chat.completions.create({
-    model: model || "gpt-4-0125-preview",
+    model: "gpt-4-0125-preview",
     messages: [
-      {role: "system", content: system || "You're a helpful assistant." },
-      {role: "user", content: prompt || "What time is it?" }
+      { role: "system", content: system || "You're a helpful assistant." },
+      { role: "user", content: prompt || "What time is it?" }
     ],
     stream: true,
     temperature: temperature || 0,

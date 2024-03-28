@@ -65,6 +65,8 @@ while ((match = regex.exec(curr_code)) !== null) {
   }
 }
 
+await fs.writeFile(curr, curr_code, 'utf-8');
+
 var tokens = GPT.token_count(curr_code);
 var holes = curr_code.match(/\[\[\w+\]\]/g) || [];
 var ask = model.startsWith("claude") ? Claude.ask : GPT.ask;
@@ -75,8 +77,8 @@ console.log("model_label:", model);
 
 for (let hole of holes) {
   console.log("next_filled: " + hole + "...");
-  var prompt = curr_code + "\nTASK: Fill the [["+hole+"]] hole. Answer only with the EXACT completion to replace [["+hole+"]] with. INDENT IT BASED ON THE CONTEXT. DO NOT USE BACKTICKS.";
-  var answer = await ask({system, prompt, model});
+  var prompt = curr_code + "\nTASK: Fill the [[" + hole + "]] hole. Answer only with the EXACT completion to replace [[" + hole + "]] with. INDENT IT BASED ON THE CONTEXT. DO NOT USE BACKTICKS.";
+  var answer = await ask({ system, prompt, model });
   file_code = file_code.replace(hole, answer);
 }
 
